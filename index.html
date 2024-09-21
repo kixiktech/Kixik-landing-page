@@ -10,60 +10,88 @@
             padding: 0;
             height: 100%;
             font-family: 'Courier New', monospace;
-            background-color: #001a00; /* Dark green background */
-            color: #adff2f; /* Yellow/green text color */
+            background-color: #001a00;
+            color: #adff2f;
             overflow: hidden;
         }
-        #logo {
+        #top-bar {
             position: absolute;
             top: 20px;
             left: 20px;
-            width: 60px;
-            height: 60px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #logo {
+            height: 40px;
+            width: auto;
         }
         #company-name {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
             font-size: 2em;
             font-weight: bold;
             font-family: Arial, Helvetica, sans-serif;
-            letter-spacing: 0.2em; /* Increased letter spacing */
+            letter-spacing: 0.2em;
+            height: 40px;
+            line-height: 40px;
+            display: flex;
+            align-items: center;
         }
         #company-name span {
             display: inline-block;
-        }
-        #company-name span:last-child {
             transform: scaleX(-1);
+            margin-left: -0.1em; /* Adjust this value to fine-tune the spacing */
         }
         #text-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1.5em;
-            text-align: center;
+            width: 300px;
+            height: 300px;
         }
         .char {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            font-size: 1.2em;
             opacity: 0;
             transition: opacity 0.1s ease-in-out;
+        }
+        #center-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
     </style>
 </head>
 <body>
-    <svg id="logo" viewBox="0 0 100 100">
+    <div id="top-bar">
+        <svg id="logo" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+            <rect width="100" height="100" fill="#001a00"/>
+            <path d="M10 10 L90 90 M90 10 L10 90" stroke="#adff2f" stroke-width="10" stroke-linecap="round"/>
+            <line x1="50" y1="10" x2="50" y2="90" stroke="#adff2f" stroke-width="10" stroke-linecap="round"/>
+        </svg>
+        <div id="company-name">KIXI<span>K</span></div>
+    </div>
+    <div id="text-container"></div>
+    <svg id="center-logo" viewBox="0 0 100 100">
         <rect width="100" height="100" fill="#001a00"/>
         <path d="M10 10 L90 90 M90 10 L10 90" stroke="#adff2f" stroke-width="10" stroke-linecap="round"/>
         <line x1="50" y1="10" x2="50" y2="90" stroke="#adff2f" stroke-width="10" stroke-linecap="round"/>
     </svg>
-    <div id="company-name">KIXI<span>K</span></div>
-    <div id="text-container"></div>
 
     <script>
-        const missionStatement = "Empowering innovation through cutting-edge technology solutions.";
+        const missionStatement = "Automating the Future – While Building Niche Focused Software Today.  ";
         let index = 0;
         const textContainer = document.getElementById('text-container');
+        const centerLogo = document.getElementById('center-logo');
+        const radius = 145;
 
         function typeText() {
             if (index < missionStatement.length) {
@@ -71,6 +99,13 @@
                 const span = document.createElement('span');
                 span.textContent = char;
                 span.className = 'char';
+                
+                const angle = (index / missionStatement.length) * 2 * Math.PI;
+                const x = radius * Math.cos(angle);
+                const y = radius * Math.sin(angle);
+                
+                span.style.transform = `translate(${x}px, ${y}px) rotate(${angle + Math.PI/2}rad)`;
+                
                 textContainer.appendChild(span);
                 setTimeout(() => {
                     span.style.opacity = 1;
@@ -78,10 +113,14 @@
                 index++;
                 setTimeout(typeText, 100); // Adjust typing speed here
             } else {
+                centerLogo.style.opacity = 1; // Show the center logo
                 setTimeout(() => {
-                    textContainer.innerHTML = '';
-                    index = 0;
-                    typeText();
+                    centerLogo.style.opacity = 0; // Hide the center logo
+                    setTimeout(() => {
+                        textContainer.innerHTML = '';
+                        index = 0;
+                        typeText();
+                    }, 500); // Wait for logo fade-out
                 }, 3000); // Wait 3 seconds before restarting
             }
         }
