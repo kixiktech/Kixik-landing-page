@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIXIK</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Courier New', monospace;
+            background-color: #001a00; /* Dark green background */
+            color: #adff2f; /* Yellow/green text color */
+            overflow: hidden;
+        }
+        #logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+        }
+        #company-name {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+            letter-spacing: 0.2em; /* Increased letter spacing */
+        }
+        #company-name span {
+            display: inline-block;
+        }
+        #company-name span:last-child {
+            transform: scaleX(-1);
+        }
+        #text-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .char {
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <svg id="logo" viewBox="0 0 100 100">
+        <rect width="100" height="100" fill="#001a00"/>
+        <path d="M10 10 L90 90 M90 10 L10 90" stroke="#adff2f" stroke-width="10" stroke-linecap="round"/>
+        <line x1="50" y1="10" x2="50" y2="90" stroke="#adff2f" stroke-width="10" stroke-linecap="round"/>
+    </svg>
+    <div id="company-name">KIXI<span>K</span></div>
+    <div id="text-container"></div>
+
+    <script>
+        const missionStatement = "Empowering innovation through cutting-edge technology solutions.";
+        let index = 0;
+        const textContainer = document.getElementById('text-container');
+
+        function typeText() {
+            if (index < missionStatement.length) {
+                const char = missionStatement.charAt(index);
+                const span = document.createElement('span');
+                span.textContent = char;
+                span.className = 'char';
+                textContainer.appendChild(span);
+                setTimeout(() => {
+                    span.style.opacity = 1;
+                }, 50);
+                index++;
+                setTimeout(typeText, 100); // Adjust typing speed here
+            } else {
+                setTimeout(() => {
+                    textContainer.innerHTML = '';
+                    index = 0;
+                    typeText();
+                }, 3000); // Wait 3 seconds before restarting
+            }
+        }
+
+        typeText();
+    </script>
+</body>
+</html>
