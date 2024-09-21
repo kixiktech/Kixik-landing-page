@@ -22,6 +22,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            z-index: 10;
         }
         #logo {
             height: 40px;
@@ -40,7 +41,7 @@
         #company-name span {
             display: inline-block;
             transform: scaleX(-1);
-            margin-left: -0.1em; /* Adjust this value to fine-tune the spacing */
+            margin-left: -0.1em;
         }
         #text-container {
             position: absolute;
@@ -56,7 +57,7 @@
             top: 50%;
             font-size: 1.2em;
             opacity: 0;
-            transition: opacity 0.1s ease-in-out;
+            transition: opacity 0.1s ease-in-out, transform 0.3s ease-out;
         }
         #center-logo {
             position: absolute;
@@ -66,7 +67,7 @@
             width: 100px;
             height: 100px;
             opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.5s ease-in-out, transform 0.3s ease-out;
         }
     </style>
 </head>
@@ -92,6 +93,7 @@
         const textContainer = document.getElementById('text-container');
         const centerLogo = document.getElementById('center-logo');
         const radius = 145;
+        let chars = [];
 
         function typeText() {
             if (index < missionStatement.length) {
@@ -107,23 +109,65 @@
                 span.style.transform = `translate(${x}px, ${y}px) rotate(${angle + Math.PI/2}rad)`;
                 
                 textContainer.appendChild(span);
+                chars.push(span);
                 setTimeout(() => {
                     span.style.opacity = 1;
                 }, 50);
                 index++;
-                setTimeout(typeText, 100); // Adjust typing speed here
+                setTimeout(typeText, 100);
             } else {
-                centerLogo.style.opacity = 1; // Show the center logo
+                centerLogo.style.opacity = 1;
                 setTimeout(() => {
-                    centerLogo.style.opacity = 0; // Hide the center logo
+                    centerLogo.style.opacity = 0;
                     setTimeout(() => {
                         textContainer.innerHTML = '';
+                        chars = [];
                         index = 0;
                         typeText();
-                    }, 500); // Wait for logo fade-out
-                }, 3000); // Wait 3 seconds before restarting
+                    }, 500);
+                }, 3000);
             }
         }
+
+        function applyGravitationalEffect(event) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            chars.forEach((char, i) => {
+                const rect = char.getBoundingClientRect();
+                const charX = rect.left + rect.width / 2;
+                const charY = rect.top + rect.height / 2;
+
+                const distanceX = mouseX - charX;
+                const distanceY = mouseY - charY;
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+                const maxDistance = Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight) / 2;
+                const force = (1 - distance / maxDistance) * 30;
+
+                const angle = (i / missionStatement.length) * 2 * Math.PI;
+                const baseX = radius * Math.cos(angle);
+                const baseY = radius * Math.sin(angle);
+
+                const newX = baseX - (distanceX / distance) * force;
+                const newY = baseY - (distanceY / distance) * force;
+
+                char.style.transform = `translate(${newX}px, ${newY}px) rotate(${angle + Math.PI/2}rad)`;
+            });
+
+            const logoRect = centerLogo.getBoundingClientRect();
+            const logoX = logoRect.left + logoRect.width / 2;
+            const logoY = logoRect.top + logoRect.height / 2;
+            const logoDistanceX = mouseX - logoX;
+            const logoDistanceY = mouseY - logoY;
+            const logoDistance = Math.sqrt(logoDistanceX * logoDistanceX + logoDistanceY * logoDistanceY);
+            const logoForce = (1 - logoDistance / maxDistance) * 20;
+
+            centerLogo.style.transform = `translate(calc(-50% - ${(logoDistanceX / logoDistance) * logoForce}px), calc(-50% - ${(logoDistanceY / logoDistance) * logoForce}px))`;
+        }
+
+        document.addEventListener('mousemove', applyGravitationalEffect);
 
         typeText();
     </script>
